@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos del Trabajador</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS para mejorar Tailwind, asegurando la fuente "Inter" y sombras sutiles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Fondo gris claro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px; /* Añadir padding para pantallas pequeñas */
+            box-sizing: border-box; /* Incluir padding en el tamaño total del elemento */
+        }
+
+        .form-container {
+            background-color: #ffffff; /* Fondo blanco para el formulario */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
+            border-radius: 1.5rem; /* Esquinas más redondeadas */
+            padding: 2.5rem; /* Padding generoso */
+            max-width: 500px; /* Ancho máximo para pantallas grandes */
+            width: 100%; /* Ancho completo en pantallas pequeñas */
+            transition: all 0.3s ease-in-out; /* Transiciones suaves para efectos hover */
+        }
+
+        .form-container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); /* Sombra ligeramente más fuerte al hacer hover */
+        }
+
+        /* Estilos para inputs y select */
+        input[type="text"],
+        input[type="number"] {
+            @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200;
+        }
+
+        /* Estilo personalizado para radio buttons para una mejor visualización */
+        input[type="radio"] {
+            /* Ocultar radio button por defecto */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.25rem; /* 20px */
+            height: 1.25rem; /* 20px */
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            margin-right: 0.5rem;
+            transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        input[type="radio"]:checked {
+            border-color: #3B82F6; /* Azul-500 */
+            background-color: #3B82F6; /* Azul-500 */
+        }
+
+        input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.5rem; /* 8px */
+            height: 0.5rem; /* 8px */
+            border-radius: 50%;
+            background-color: #fff; /* Punto blanco */
+        }
+
+        input[type="radio"]:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Azul-500 con transparencia */
+        }
+
+        /* Estilo para el botón de envío */
+        .submit-button {
+            @apply w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300 ease-in-out transform hover:scale-105;
+        }
+
+        /* Caja de mensajes para feedback */
+        #message-box {
+            @apply mt-6 p-4 rounded-lg text-center font-medium transition-opacity duration-300;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+        #message-box.show {
+            opacity: 1;
+            height: auto;
+            overflow: visible;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Datos del Trabajador</h1>
+
+        <form id="workerForm" class="space-y-6">
+            <!-- Input para Nombre -->
+            <div>
+                <label for="name" class="block text-gray-700 text-lg font-semibold mb-2">Nombre Completo:</label>
+                <input type="text" id="name" name="name" placeholder="Escribe el nombre del trabajador" required>
+            </div>
+
+            <!-- Input para Edad -->
+            <div>
+                <label for="age" class="block text-gray-700 text-lg font-semibold mb-2">Edad:</label>
+                <input type="number" id="age" name="age" placeholder="Edad del trabajador" min="18" max="99" required>
+            </div>
+
+            <!-- Selección de Sexo -->
+            <div>
+                <label class="block text-gray-700 text-lg font-semibold mb-2">Sexo:</label>
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-8">
+                    <label class="inline-flex items-center text-gray-800 text-base cursor-pointer">
+                        <input type="radio" name="sex" value="Masculino" required>
+                        Masculino
+                    </label>
+                    <label class="inline-flex items-center text-gray-800 text-base cursor-pointer">
+                        <input type="radio" name="sex" value="Femenino" required>
+                        Femenino
+                    </label>
+                    <label class="inline-flex items-center text-gray-800 text-base cursor-pointer">
+                        <input type="radio" name="sex" value="Otro" required>
+                        Otro
+                    </label>
+                </div>
+            </div>
+
+            <!-- Botón de Envío -->
+            <button type="submit" class="submit-button">
+                Registrar Datos
+            </button>
+        </form>
+
+        <!-- Caja de Mensajes para feedback -->
+        <div id="message-box" class="bg-green-100 text-green-700 show">
+            <!-- El contenido será insertado por JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const workerForm = document.getElementById('workerForm');
+            const messageBox = document.getElementById('message-box');
+
+            // ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ATENCIÓN CRÍTICA AL USUARIO!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // EL ERROR QUE SIGUES VIENDO ("ERROR: La URL de Google Apps Script no está configurada")
+            // SIGNIFICA QUE ESTA LÍNEA DE CÓDIGO AÚN CONTIENE EL MARCADOR DE POSICIÓN.
+            //
+            // DEBES REEMPLAZAR LITERALMENTE LA CADENA 'PEGA_TU_URL_DE_APLICACION_WEB_AQUI'
+            // CON LA URL REAL Y COMPLETA QUE OBTUVISTE AL DESPLEGAR TU PROYECTO
+            // DE GOOGLE APPS SCRIPT COMO UNA APLICACIÓN WEB.
+            //
+            // EJEMPLO DE URL REAL (¡NO USES ESTA, ES SOLO UN EJEMPLO!):
+            // const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz_TuUrlUnicaAqui/exec';
+            //
+            // PASOS PARA OBTENER LA URL CORRECTA:
+            // 1. Abre tu proyecto de Google Apps Script.
+            // 2. En la barra superior, haz clic en el botón "Desplegar" (Deploy).
+            // 3. Selecciona "Administrar implementaciones" (Manage deployments).
+            // 4. En la ventana que aparece, verás tu implementación. La "URL de la aplicación web" es la que necesitas copiar.
+            // 5. Pégala aquí, SOBRESCRIBIENDO completamente el texto 'PEGA_TU_URL_DE_APLICACION_WEB_AQUI'.
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw8qwOUN3FDkdGSiLpQb7ik7jwYv8RpEKpbxbRdWkz1ZQuE26QEYvamSCbQwqrOaIlomw/exec'; // <--- ¡¡¡DEBES CAMBIAR ESTO AHORA MISMO!!!
+
+            // Comprobación para recordar al usuario que debe cambiar la URL
+            if (WEB_APP_URL === 'ERROR: La URL de Google Apps Script no está configurada') {
+                console.error(
+                    '¡ERROR DE CONFIGURACIÓN CRÍTICO! La URL de Google Apps Script NO ha sido reemplazada. ' +
+                    'Por favor, edita el archivo HTML y reemplaza "PEGA_TU_URL_DE_APLICACION_WEB_AQUI" con tu URL real. ' +
+                    'Esta URL es ABSOLUTAMENTE necesaria para que el formulario se conecte con tu Google Sheet.'
+                );
+                showMessage('ERROR CRÍTICO: ¡La URL de Google Apps Script no está configurada! Consulta la consola para más detalles.', 'error');
+                // Deshabilitar el botón para evitar intentos fallidos hasta que se configure correctamente
+                workerForm.querySelector('button[type="submit"]').disabled = true;
+            }
+
+
+            workerForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Evita el envío de formulario por defecto
+
+                // Si la URL no está configurada, no intentes enviar
+                if (WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbw8qwOUN3FDkdGSiLpQb7ik7jwYv8RpEKpbxbRdWkz1ZQuE26QEYvamSCbQwqrOaIlomw/exec') {
+                    // El mensaje ya fue mostrado por la comprobación inicial, solo retorna.
+                    return;
+                }
+
+                const name = document.getElementById('name').value;
+                const age = document.getElementById('age').value;
+                const sex = document.querySelector('input[name="sex"]:checked');
+
+                if (name && age && sex) {
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('age', age);
+                    formData.append('sex', sex.value);
+
+                    try {
+                        const response = await fetch(WEB_APP_URL, {
+                            method: 'POST',
+                            body: formData // FormData se envía como 'multipart/form-data' automáticamente
+                        });
+
+                        const result = await response.json(); // Espera la respuesta JSON del Apps Script
+
+                        if (result.result === 'success') {
+                            showMessage(`¡Datos de ${name} registrados con éxito!`, 'success');
+                            workerForm.reset(); // Limpia el formulario
+                        } else {
+                            showMessage(`Error al registrar: ${result.message}`, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error al enviar los datos:', error);
+                        showMessage('Hubo un problema de conexión. Intenta de nuevo más tarde.', 'error');
+                    }
+
+                } else {
+                    showMessage('Por favor, completa todos los campos del formulario.', 'error');
+                }
+            });
+
+            /**
+             * Muestra un mensaje en el cuadro de mensajes.
+             * @param {string} message - El mensaje a mostrar.
+             * @param {'success' | 'error'} type - El tipo de mensaje ('success' o 'error').
+             */
+            function showMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.className = 'mt-6 p-4 rounded-lg text-center font-medium transition-opacity duration-300 show'; // Reinicia clases y muestra
+
+                if (type === 'success') {
+                    messageBox.classList.add('bg-green-100', 'text-green-700');
+                    messageBox.classList.remove('bg-red-100', 'text-red-700');
+                } else if (type === 'error') {
+                    messageBox.classList.add('bg-red-100', 'text-red-700');
+                    messageBox.classList.remove('bg-green-100', 'text-green-700');
+                }
+
+                // Oculta el mensaje después de 5 segundos
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                    setTimeout(() => {
+                        messageBox.textContent = ''; // Limpia el texto después de la transición
+                    }, 300); // Coincide con la duración de la transición
+                }, 5000);
+            }
+
+            // Inicialmente oculta el cuadro de mensajes
+            messageBox.classList.remove('show');
+            messageBox.textContent = ''; // Asegura que esté vacío al cargar
+        });
+    </script>
+</body>
+</html>
